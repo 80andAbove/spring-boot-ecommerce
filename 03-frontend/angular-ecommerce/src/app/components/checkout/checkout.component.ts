@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { FormGroup } from '@angular/forms';
+import { FormBuilder, FormGroup } from '@angular/forms';
 
 @Component({
   selector: 'app-checkout',
@@ -9,6 +9,9 @@ import { FormGroup } from '@angular/forms';
 export class CheckoutComponent implements OnInit {
 
   checkoutFormGroup: FormGroup;
+
+  totalPrice: number = 0;
+  totalQuantity: number = 0;
 
   constructor(private formBuilder: FormBuilder) { }
 
@@ -45,6 +48,16 @@ export class CheckoutComponent implements OnInit {
     });
   }
   
+  copyShippingAddressToBillingAddress(event){
+    if(event.target.checked){
+      this.checkoutFormGroup.controls.billingAddress
+      .setValue(this.checkoutFormGroup.controls.shippingAddress.value);
+    }
+    else {
+      this.checkoutFormGroup.controls.billingAddress.reset();
+    }
+  }
+
   onSubmit(){
     console.log("Handling the submit btn");
     console.log(this.checkoutFormGroup.get('customer').value);
