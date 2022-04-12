@@ -3,8 +3,6 @@ import myAppConfig from 'src/app/config/my-app-config';
 import { OktaAuthStateService } from '@okta/okta-angular';
 import * as OktaSignIn from '@okta/okta-signin-widget';
 
-import myAppConfig from '../../config/my-app-config';
-
 @Component({
   selector: 'app-login',
   templateUrl: './login.component.html',

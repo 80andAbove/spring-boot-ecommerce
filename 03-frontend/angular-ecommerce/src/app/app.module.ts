@@ -25,6 +25,7 @@ import {
 } from '@okta/okta-angular';
 
 import myAppConfig from './config/my-app-config';
+import { MembersPageComponent } from './components/members-page/members-page.component';
 
 const oktaConfig = Object.assign({
   onAuthRequired: (injector) => {
@@ -35,6 +36,7 @@ const oktaConfig = Object.assign({
 }, myAppConfig.oidc);
 
 const routes: Routes = [
+  { path: 'members', component: MembersPageComponent, canActivate: [ OktaAuthModule ] },
   { path: 'login/callback', component: OktaCallbackComponent },
   { path: 'login', component: LoginComponent },
 
@@ -60,6 +62,7 @@ const routes: Routes = [
     CheckoutComponent,
     LoginComponent,
     LoginStatusComponent,
+    MembersPageComponent,
   ],
   imports: [
     RouterModule.forRoot(routes),
