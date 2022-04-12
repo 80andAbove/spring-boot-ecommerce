@@ -3,6 +3,8 @@ import myAppConfig from 'src/app/config/my-app-config';
 import { OktaAuthStateService } from '@okta/okta-angular';
 import * as OktaSignIn from '@okta/okta-signin-widget';
 
+import myAppConfig from '../../config/my-app-config';
+
 @Component({
   selector: 'app-login',
   templateUrl: './login.component.html',
@@ -14,6 +16,9 @@ export class LoginComponent implements OnInit {
 
   constructor(private oktaAuthService: OktaAuthStateService) { 
     this.oktaSignin = new OktaSignIn({
+      features: {
+        registration: true
+      },
       logo: 'assets/images/logo.png',
       baseUrl: myAppConfig.oidc.issuer.split('/oauth2')[0],
       clientId: myAppConfig.oidc.clientId,
