@@ -5,10 +5,12 @@ import { BehaviorSubject, Subject } from 'rxjs';
 import { Country } from 'src/app/common/country';
 import { Order } from 'src/app/common/order';
 import { OrderItem } from 'src/app/common/order-item';
+import { PaymentInfo } from 'src/app/common/payment-info';
 import { Purchase } from 'src/app/common/purchase';
 import { State } from 'src/app/common/state';
 import { Luv2ShopFormService } from 'src/app/services/luv2-shop-form.service';
 import { Luv2ShopValidators } from 'src/app/validators/luv2-shop-validators';
+import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'app-checkout',
@@ -32,6 +34,14 @@ export class CheckoutComponent implements OnInit {
 
   storage: Storage = sessionStorage;
 
+  stripe = Stripe(environment.stripePublishiableKey);
+
+  isDisabled: boolean = false;
+
+  paymentInfo: PaymentInfo = new PaymentInfo());
+  cardElement: any;
+  displayError: any = "";
+
   constructor(private formBuilder: FormBuilder,
               private luv2ShopFormService: Luv2ShopFormService,
               private cartService: CartService,
@@ -39,6 +49,8 @@ export class CheckoutComponent implements OnInit {
               private router: Router) { }
 
   ngOnInit(): void {
+
+    this.setupStripPaymentForm();
 
     this.reviewCartDetails();
 
@@ -85,24 +97,24 @@ export class CheckoutComponent implements OnInit {
       }),
     }),
 
-    // populate credit card months
-    const startMonth: number = new Date().getMonth() + 1;
-    console.log(`Start Month: ${startMonth}`);
+    // // populate credit card months
+    // const startMonth: number = new Date().getMonth() + 1;
+    // console.log(`Start Month: ${startMonth}`);
 
-    this.luv2ShopFormService.getCreditCardMonths(startMonth).subscribe(
-      data => {
-        console.log(`Retrieved credit card months: ${JSON.stringify(data)}`);
-        this.creditCardMonths = data;
-      }
-    );
+    // this.luv2ShopFormService.getCreditCardMonths(startMonth).subscribe(
+    //   data => {
+    //     console.log(`Retrieved credit card months: ${JSON.stringify(data)}`);
+    //     this.creditCardMonths = data;
+    //   }
+    // );
 
-    // populate credit card years
-    this.luv2ShopFormService.getCreditCardYears().subscribe(
-      data => {
-      console.log(`Retrieved credit card months: ${JSON.stringify(data)}`);
-      this.creditCardMonths = data;
-      }
-    );
+    // // populate credit card years
+    // this.luv2ShopFormService.getCreditCardYears().subscribe(
+    //   data => {
+    //   console.log(`Retrieved credit card months: ${JSON.stringify(data)}`);
+    //   this.creditCardMonths = data;
+    //   }
+    // );
 
     // populate countries
     this.luv2ShopFormService.getCountries().subscribe(
@@ -181,14 +193,56 @@ export class CheckoutComponent implements OnInit {
     purchase.order = order;
     purchase.orderItem = orderItems;
 
-    this.checkoutService.placeOrder(purchase).subscribe({
-      next: response => {
-        alert(`Your order has been received. \nOrder tracking number: ${response.orderTrackingNumber}`);
-      },
-      error: err =>{
-        alert(`There was an error: ${err.message}`);
-      }
-    });
+    this.paymentInfo.amount = Math.round(this.totalPrice * 100);
+    this.paymentInfo.currency = "USD";
+    this.paymentInfo.receiptEmail = purchase.customer.email;
+
+    if(!this.checkoutFormGroup.invalid && this.displayError.textContent === ""){
+      this.isDisabled = true;
+      this.checkoutService.createPaymentIntent(this.paymentInfo).subscribe(
+        (paymentIntentInfoResponse) => {
+          this.stripe.confirmCardPayment(paymentIntentInfoResponse.client_secret,
+            {
+              payment_method: {
+                card: this.cardElement,
+                billing_details: {
+                  email: purchase.customer.email,
+                  name: `${purchase.customer.firstName} ${purchase.customer.lastName}`,
+                  address: {
+                    linel: purchase.billingAddress.street,
+                    city: purchase.billingAddress.city,
+                    state: purchase.billingAddress.state,
+                    postal_code: purchase.billingAddress.zipCode,
+                    country: purchase.billingAddress.country,
+                  }
+                }
+              }
+            }, { handleActions: false })
+          .then(function(result){
+            if (result.error){
+              alert(`There was an error: ${result.error.message}`);
+              this.isDisabled = false;
+            } else {
+              this.checkoutService.placeOrder(purchase).subscribe({
+                next: response => {
+                  alert(`Your order has been received. \nOrder tracking number: ${response.orderTrackingNumber}`);
+
+                  this.resetCart();
+                  this.isDisabled = false;
+                },
+                error: err => {
+                  alert(`There was an error: ${err.message}`);
+                  this.isDisabled = false;
+                }
+              })
+            }
+          }.bind(this);
+        }
+      );
+    } else {
+      this.checkoutFormGroup.markAllAsTouched();
+      return;
+    }
 
     console.log(this.checkoutFormGroup.get('customer').value);
     console.log(`The email address is ${this.checkoutFormGroup.get('customer').value.email}`);
@@ -205,6 +259,7 @@ export class CheckoutComponent implements OnInit {
     this.checkoutFormGroup.reset();
 
     this.router.navigateByUrl("/product");
+    this.cartService.persistCartItems();
   }
 
   handleMonthsAndYears(){
@@ -246,6 +301,30 @@ export class CheckoutComponent implements OnInit {
         }
         formGroup.get('state').setValue(data[0]);
       }
+    );
+  }
+
+  setupStripePaymentForm(){
+    var elements = this.strip.elements();
+
+    this.cardElement = elements.create('card', { hidePostalCode: true });
+
+    this.cardElement.mount('#card-element');
+
+    this.cardElement.on('change', (event) => {
+      this.displayError = document.getElementById('card-errors');
+
+      if(event.complete){
+        this.displayError.textContent = "";
+      } else if(event.error){
+        this.displayError.textContent = event.error.message;
+      }
+    });
+  }
+
+  reviewCartDetails(){
+    this.cartService.totalPrice.subscribe(
+      totalPrice => this.totalPrice = totalPrice
     );
   }
 }
