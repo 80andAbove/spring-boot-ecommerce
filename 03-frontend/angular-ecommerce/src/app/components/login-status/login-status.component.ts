@@ -1,5 +1,5 @@
 import { Component, Inject, OnInit } from '@angular/core';
-import * as oktaAuth from '@okta/okta-angular'
+import { OktaAuth } from '@okta/okta-auth-js'
 import { OktaAuthStateService, OKTA_AUTH } from '@okta/okta-angular';
 
 @Component({
@@ -27,7 +27,7 @@ export class LoginStatusComponent implements OnInit {
 
   getUserDetails(){
     if(this.isAuthenticated){
-      this.oktaAuthService.getUser().then(
+      this.oktaAuth.getUser().then(
         (res) => {
           this.userFullName = res.name;
           const theEmail = res.email;
@@ -39,7 +39,7 @@ export class LoginStatusComponent implements OnInit {
   }
 
   logout(){
-    this.oktaAuthService.signOut();
+    this.oktaAuth.signOut();
   }
 
 }

@@ -9,6 +9,7 @@ import { Routes, RouterModule, Router } from '@angular/router';
 import { ProductCategoryMenuComponent } from './components/product-category-menu/product-category-menu.component';
 import { SearchComponent } from './components/search/search.component';
 import { ProductDetailsComponent } from './components/product-details/product-details.component';
+import { OktaAuth } from '@okta/okta-auth-js'
 
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { CartStatusComponent } from './components/cart-status/cart-status.component';
@@ -37,7 +38,7 @@ const oktaConfig = Object.assign({
   }
 }, myAppConfig.oidc);
 
-const oktaAuth: OktaAuth = new OktaAuthModule(oktaConfig);
+const oktaAuth: OktaAuth = new OktaAuth(oktaConfig);
 
 const routes: Routes = [
   { path: 'order-history', component: OrderHistoryComponent, canActivate: [ OktaAuthModule ] },
