@@ -35,7 +35,7 @@ public class Customer {
             if(orders == null){
                 orders = new HashSet<>();
             }
-            order.add(order);
+            orders.add(order);
             order.setCustomer(this);
         }
     }
