@@ -40,7 +40,7 @@ export class CheckoutComponent implements OnInit {
 
   isDisabled: boolean = false;
 
-  paymentInfo: PaymentInfo = new PaymentInfo());
+  paymentInfo: PaymentInfo = new PaymentInfo();
   cardElement: any;
   displayError: any = "";
 
@@ -61,7 +61,7 @@ export class CheckoutComponent implements OnInit {
     this.checkoutFormGroup = this.formBuilder.group({
       customer: this.formBuilder.group({
         firstName: new FormControl('', [Validators.required, Validators.minLength(2)]),
-        lastName: new FormControl('', [Validators.required, Validators.minLength(2)]),,
+        lastName: new FormControl('', [Validators.required, Validators.minLength(2)]),
         email: new FormControl(theEmail, 
                               [Validators.required, 
                               Validators.pattern('^[a-z0-9._%+-]+@[a-z0-9.-]+\\.[a-z]{2,4}$')]),
@@ -200,7 +200,9 @@ export class CheckoutComponent implements OnInit {
     this.paymentInfo.receiptEmail = purchase.customer.email;
 
     if(!this.checkoutFormGroup.invalid && this.displayError.textContent === ""){
+
       this.isDisabled = true;
+      
       this.checkoutService.createPaymentIntent(this.paymentInfo).subscribe(
         (paymentIntentInfoResponse) => {
           this.stripe.confirmCardPayment(paymentIntentInfoResponse.client_secret,
@@ -238,7 +240,7 @@ export class CheckoutComponent implements OnInit {
                 }
               })
             }
-          }.bind(this);
+          }.bind(this));
         }
       );
     } else {
@@ -307,7 +309,7 @@ export class CheckoutComponent implements OnInit {
   }
 
   setupStripePaymentForm(){
-    var elements = this.strip.elements();
+    var elements = this.stripe.elements();
 
     this.cardElement = elements.create('card', { hidePostalCode: true });
 
