@@ -1,6 +1,5 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
-import { start } from 'repl';
 import { BehaviorSubject, Subject } from 'rxjs';
 import { Country } from 'src/app/common/country';
 import { Order } from 'src/app/common/order';
@@ -11,6 +10,9 @@ import { State } from 'src/app/common/state';
 import { Luv2ShopFormService } from 'src/app/services/luv2-shop-form.service';
 import { Luv2ShopValidators } from 'src/app/validators/luv2-shop-validators';
 import { environment } from 'src/environments/environment';
+import { CartService } from 'src/app/services/cart.service';
+import { CheckoutService } from 'src/app/services/checkout.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-checkout',
@@ -21,8 +23,8 @@ export class CheckoutComponent implements OnInit {
 
   checkoutFormGroup: FormGroup;
 
-  totalPrice: Subject<number> new BehaviorSubject<number>(0);
-  totalQuantity: Subject<number> new BehaviorSubject<number>(0);
+  totalPrice: number = 0;
+  totalQuantity: number = 0;
 
   creditCardYears: number[] = [];
   creditCardMonths: number[] = [];
@@ -50,7 +52,7 @@ export class CheckoutComponent implements OnInit {
 
   ngOnInit(): void {
 
-    this.setupStripPaymentForm();
+    this.setupStripePaymentForm();
 
     this.reviewCartDetails();
 
