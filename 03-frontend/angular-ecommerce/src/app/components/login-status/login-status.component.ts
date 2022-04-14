@@ -1,5 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, Inject, OnInit } from '@angular/core';
 import * as oktaAuth from '@okta/okta-angular'
+import { OktaAuthStateService, OKTA_AUTH } from '@okta/okta-angular';
 
 @Component({
   selector: 'app-login-status',
@@ -13,12 +14,12 @@ export class LoginStatusComponent implements OnInit {
 
   storage: Storage = sessionStorage;
 
-  constructor(private oktaAuthService: oktaAuth) { }
+  constructor(public authStateService: OktaAuthStateService, @Inject(OKTA_AUTH) private oktaAuth: OktaAuth) { }
 
   ngOnInit(): void {
-    this.oktaAuthService.$authenticationState.subscribe(
+    this.authStateService.authState$.subscribe(
       (result) => {
-        this.isAuthenticated = result;
+        this.isAuthenticated = result.isAuthenticated;
         this.getUserDetails();
       }
     )

@@ -37,6 +37,8 @@ const oktaConfig = Object.assign({
   }
 }, myAppConfig.oidc);
 
+const oktaAuth: OktaAuth = new OktaAuthModule(oktaConfig);
+
 const routes: Routes = [
   { path: 'order-history', component: OrderHistoryComponent, canActivate: [ OktaAuthModule ] },
   { path: 'members', component: MembersPageComponent, canActivate: [ OktaAuthModule ] },
@@ -76,7 +78,7 @@ const routes: Routes = [
     ReactiveFormsModule,
     OktaAuthModule,
   ],
-  providers: [ProductService, { provide: OKTA_CONFIG, useValue: oktaConfig }, { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptorService, multi: true }],
+  providers: [ProductService, { provide: OKTA_CONFIG, useValue: { oktaAuth }}],
   bootstrap: [AppComponent]
 })
 export class AppModule { }
