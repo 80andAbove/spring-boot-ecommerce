@@ -46,7 +46,7 @@ export class ProductListComponent implements OnInit {
   }
 
   handleSearchProducts() {
-    const theKeyword: String = this.route.snapshot.paramMap.get('keyword');
+    const theKeyword: string = this.route.snapshot.paramMap.get('keyword');
 
     if (this.previousKeyword != theKeyword){
       this.thePageNumber = 1;

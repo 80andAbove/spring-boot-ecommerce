@@ -36,7 +36,7 @@ export class CheckoutComponent implements OnInit {
 
   storage: Storage = sessionStorage;
 
-  stripe = Stripe(environment.stripePublishiableKey);
+  stripe = Stripe(environment.stripePublishableKey);
 
   isDisabled: boolean = false;
 

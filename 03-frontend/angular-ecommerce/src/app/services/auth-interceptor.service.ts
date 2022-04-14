@@ -19,7 +19,7 @@ export class AuthInterceptorService implements HttpInterceptor{
     const theEndpoints = environment.luv2shopApiUrl + '/orders';
     const securedEndpoints = ['http://localhost:8080/api/orders'];
     if(securedEndpoints.some(url => request.urlWithParams.includes(url))){
-      const accessToken = await this.oktaAuth.getAccessToken();
+      const accessToken = await this.oktaAuth;
       request = request.clone({
         setHeaders: {
           Authorization: 'Bearer ' + accessToken
