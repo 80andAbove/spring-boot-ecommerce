@@ -18,13 +18,13 @@ public class Customer {
     @Column(name="id")
     private Long id;
 
-    @Column(name="id")
+    @Column(name="firstName")
     private String firstName;
 
-    @Column(name="id")
+    @Column(name="lastName")
     private String lastName;
 
-    @Column(name="id")
+    @Column(name="email")
     private String email;
 
     @OneToMany(mappedBy="customer", cascade = CascadeType.ALL)
